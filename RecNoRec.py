@@ -76,13 +76,16 @@ def serv(line_spl):
         serv_mount(line_spl[0],line_spl[1],line_spl[2],line_spl[3])
 
 def securos(config):
+    # Считываем список серверов из файла настроек
     dict_const = {'servers': [str_serv.strip() for str_serv in config["servers"]["servers"].split(',')]}
     for serv in dict_const['servers']:
         # print(serv)
+        # Согласно списка собираем данные по серверам
         dict_const[serv] = [config[serv]["ip_serv"],
                             [str_fold.strip() for str_fold in config[serv]["ip_fold"].split(',')],
                             config[serv]["folder"], [str_ip.strip() for str_ip in config[serv]["ip_cam"].split(',')]]
         # print(os.listdir(path="\\\\10.64.130.249\SkladTMC"))
+        # Проверяем доступность каталога
         try:
             dir_cam = os.listdir(f"\\\\{dict_const[serv][0]}\{dict_const[serv][1][0]}")
             print("\033[32m" + dict_const[serv][0] + " - Подключен \033[37m")
@@ -90,16 +93,25 @@ def securos(config):
             print("\033[31m" + dict_const[serv][0] + " - Подключение отсутсвует \033[37m")
         date_cam = {}
         for ind in dict_const[serv][1]:
+            # Получаем список каталогов с камерами
             dir_cam = os.listdir(f"\\\\{dict_const[serv][0]}\{ind}")
             for dir_cam_n in range(1, int(dict_const[serv][2]) + 1):
+                # Проверяем есть ли нужные камеры в списке
                 if f"CAM_{dir_cam_n}" in dir_cam:
+                    # Получаем даты за которые есть запись
                     date_cam_dir = os.listdir(f"\\\\{dict_const[serv][0]}\{ind}\CAM_{dir_cam_n}")
                     if f"CAM_{dir_cam_n}" in date_cam:
+                        # Если данные по камере уже есть, то дабавляем
                         date_cam[f"CAM_{dir_cam_n}"].append(date_cam_dir[len(date_cam_dir) - 1][:10])
                     else:
+                        # Если данных по камере нет, то создаем
                         date_cam[f"CAM_{dir_cam_n}"] = [date_cam_dir[len(date_cam_dir) - 1][:10]]
                     # print(f"CAM_{dir_cam_n}","->",date_cam_dir[len(date_cam_dir)-1][:10],"->",now_date)
+                else:
+                    print(f"Каталог CAM_{dir_cam_n} - отсутсвует")
+
         for dir_cam_n in range(1, int(dict_const[serv][2]) + 1):
+            # Проверяем, существует ли сегодняшняя дата в списке
             if now_date in date_cam[f"CAM_{dir_cam_n}"]:
                 print("\033[32m  " + dict_const[serv][3][dir_cam_n - 1] + " \033[37m", end=" ")
             else:
