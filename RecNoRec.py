@@ -4,6 +4,9 @@
 import os
 os.system("") #Костыль для вывода цвета
 import datetime
+import configparser
+
+
 now_date = datetime.datetime.today().strftime("%Y-%m-%d")
 #now_date = "2022-01-24"
 
@@ -52,6 +55,8 @@ def serv_path(upath,ipcam):
     """
     Функия работает с расшаренными сетевыми папками
     """
+    print(upath)
+    print(os.listdir(path="\\\\10.64.130.249\SkladTMC"))
     try:
         if now_date in os.listdir(path=upath):
             print("\033[32m"+upath+" - Подключен \033[37m\n\033[32m  Актуальный каталог "+now_date+" - Существует \033[37m")
@@ -69,12 +74,57 @@ def serv(line_spl):
         serv_path(line_spl[0],line_spl[1])
     else:
         serv_mount(line_spl[0],line_spl[1],line_spl[2],line_spl[3])
-        
+
+def securos(config):
+    dict_const = {'servers': [str_serv.strip() for str_serv in config["servers"]["servers"].split(',')]}
+    for serv in dict_const['servers']:
+        # print(serv)
+        dict_const[serv] = [config[serv]["ip_serv"],
+                            [str_fold.strip() for str_fold in config[serv]["ip_fold"].split(',')],
+                            config[serv]["folder"], [str_ip.strip() for str_ip in config[serv]["ip_cam"].split(',')]]
+        # print(os.listdir(path="\\\\10.64.130.249\SkladTMC"))
+        try:
+            dir_cam = os.listdir(f"\\\\{dict_const[serv][0]}\{dict_const[serv][1][0]}")
+            print("\033[32m" + dict_const[serv][0] + " - Подключен \033[37m")
+        except:
+            print("\033[31m" + dict_const[serv][0] + " - Подключение отсутсвует \033[37m")
+        date_cam = {}
+        for ind in dict_const[serv][1]:
+            dir_cam = os.listdir(f"\\\\{dict_const[serv][0]}\{ind}")
+            for dir_cam_n in range(1, int(dict_const[serv][2]) + 1):
+                if f"CAM_{dir_cam_n}" in dir_cam:
+                    date_cam_dir = os.listdir(f"\\\\{dict_const[serv][0]}\{ind}\CAM_{dir_cam_n}")
+                    if f"CAM_{dir_cam_n}" in date_cam:
+                        date_cam[f"CAM_{dir_cam_n}"].append(date_cam_dir[len(date_cam_dir) - 1][:10])
+                    else:
+                        date_cam[f"CAM_{dir_cam_n}"] = [date_cam_dir[len(date_cam_dir) - 1][:10]]
+                    # print(f"CAM_{dir_cam_n}","->",date_cam_dir[len(date_cam_dir)-1][:10],"->",now_date)
+        for dir_cam_n in range(1, int(dict_const[serv][2]) + 1):
+            if now_date in date_cam[f"CAM_{dir_cam_n}"]:
+                print("\033[32m  " + dict_const[serv][3][dir_cam_n - 1] + " \033[37m", end=" ")
+            else:
+                print("\033[31m  " + dict_const[serv][3][dir_cam_n - 1] + " \033[37m", end=" ")
+
+        print("")
+# Инициализация основных переменных
+config = configparser.ConfigParser()
+config.read("securos.ini", encoding="utf-8")
+
 file_ip = open('ip.conf','r')
 for line in file_ip:
     line_spl = line.split(';')
     serv(line_spl)
 file_ip.close()
-input ('\n\nДля завершения нажмите ввод')
+securos(config)
+
+
+print("Анализ серверов SecurOS:")
+
+    # print(date_cam)
+
+# dict_const['ping_device'] = int(config["ping_time"]["ping_device"])
+# dict_const['time_out'] = int(config["ping_time"]["time_out"])
+# print(dict_const)
+# input ('\n\nДля завершения нажмите ввод')
 
 
