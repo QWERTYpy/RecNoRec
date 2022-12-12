@@ -55,8 +55,8 @@ def serv_path(upath,ipcam):
     """
     Функия работает с расшаренными сетевыми папками
     """
-    print(upath)
-    print(os.listdir(path="\\\\10.64.130.249\SkladTMC"))
+    # print(upath)
+    # print(os.listdir(path="\\\\10.64.130.249\SkladTMC"))
     try:
         if now_date in os.listdir(path=upath):
             print("\033[32m"+upath+" - Подключен \033[37m\n\033[32m  Актуальный каталог "+now_date+" - Существует \033[37m")
@@ -107,8 +107,8 @@ def securos(config):
                         # Если данных по камере нет, то создаем
                         date_cam[f"CAM_{dir_cam_n}"] = [date_cam_dir[len(date_cam_dir) - 1][:10]]
                     # print(f"CAM_{dir_cam_n}","->",date_cam_dir[len(date_cam_dir)-1][:10],"->",now_date)
-                else:
-                    print(f"Каталог CAM_{dir_cam_n} - отсутсвует")
+                # else:
+                #     print(f"Каталог CAM_{dir_cam_n} - отсутсвует")
 
         for dir_cam_n in range(1, int(dict_const[serv][2]) + 1):
             # Проверяем, существует ли сегодняшняя дата в списке
@@ -127,16 +127,17 @@ for line in file_ip:
     line_spl = line.split(';')
     serv(line_spl)
 file_ip.close()
+print("\nАнализ серверов SecurOS:")
 securos(config)
 
 
-print("Анализ серверов SecurOS:")
+
 
     # print(date_cam)
 
 # dict_const['ping_device'] = int(config["ping_time"]["ping_device"])
 # dict_const['time_out'] = int(config["ping_time"]["time_out"])
 # print(dict_const)
-# input ('\n\nДля завершения нажмите ввод')
+input ('\n\nДля завершения нажмите ввод')
 
 
