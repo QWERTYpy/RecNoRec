@@ -23,19 +23,18 @@ def serv_mount(upath,ipcam,name=None,pwd=None):
     os.chdir("H:/")
     if os.path.exists(now_date):
         print("\033[32m   Актуальный каталог "+now_date+" - Существует \033[37m")
-        find_cam("H:",ipcam)
+        find_cam("H:", ipcam)
     else:
-        print("\033[31m   Актуальный каталог "+now_date+" - Отсутствует \033[37m") 
-
-    
+        print("\033[31m   Актуальный каталог "+now_date+" - Отсутствует \033[37m")
     os.chdir("C:/")
     os.system("net use h: /delete")
+
 
 def find_cam(upath,ipcam_str):
     """
     Функиця поиска присутсвует ли запись по камерам
     """
-    spis_cam=[]
+    spis_cam = []
     for dir_cam in os.listdir(path=upath+'\\'+now_date):
         if '(' in dir_cam[10:13]:
             if '(' in dir_cam[10:12]:
@@ -51,12 +50,11 @@ def find_cam(upath,ipcam_str):
         else:
             print("\033[31m  "+str(cam)+" \033[37m", end=" ")
 
+
 def serv_path(upath,ipcam):
     """
-    Функия работает с расшаренными сетевыми папками
+    Функция работает с расшаренными сетевыми папками
     """
-    # print(upath)
-    # print(os.listdir(path="\\\\10.64.130.249\SkladTMC"))
     try:
         if now_date in os.listdir(path=upath):
             print("\033[32m"+upath+" - Подключен \033[37m\n\033[32m  Актуальный каталог "+now_date+" - Существует \033[37m")
@@ -66,14 +64,15 @@ def serv_path(upath,ipcam):
     except:
        print("\033[31m"+upath+" - Подключение отсутсвует \033[37m")
     print('\n')
-    
 print ('Добро пожаловать. Идет анализ системы ...\n'+'='*50)
+
 
 def serv(line_spl):
     if line_spl[3].strip() == "0":
-        serv_path(line_spl[0],line_spl[1])
+        serv_path(line_spl[0], line_spl[1])
     else:
-        serv_mount(line_spl[0],line_spl[1],line_spl[2],line_spl[3])
+        serv_mount(line_spl[0], line_spl[1], line_spl[2], line_spl[3])
+
 
 def securos(config):
     # Считываем список серверов из файла настроек
@@ -131,26 +130,19 @@ def securos(config):
                 print("\033[31m  " + dict_const[serv][3][dir_cam_n - 1] + " \033[37m", end=" ")
 
         print("")
+
+
 # Инициализация основных переменных
 config = configparser.ConfigParser()
 config.read("securos.ini", encoding="utf-8")
 
-file_ip = open('ip.conf','r')
+file_ip = open('ip.conf', 'r')
 for line in file_ip:
     line_spl = line.split(';')
     serv(line_spl)
 file_ip.close()
 print("\nАнализ серверов SecurOS:")
 securos(config)
-
-
-
-
-    # print(date_cam)
-
-# dict_const['ping_device'] = int(config["ping_time"]["ping_device"])
-# dict_const['time_out'] = int(config["ping_time"]["time_out"])
-# print(dict_const)
-input ('\n\nДля завершения нажмите ввод')
+input('\n\nДля завершения нажмите ввод')
 
 
