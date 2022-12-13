@@ -83,23 +83,35 @@ def securos(config):
         # Согласно списка собираем данные по серверам
         dict_const[serv] = [config[serv]["ip_serv"],
                             [str_fold.strip() for str_fold in config[serv]["ip_fold"].split(',')],
-                            config[serv]["folder"], [str_ip.strip() for str_ip in config[serv]["ip_cam"].split(',')]]
+                            config[serv]["folder"],
+                            [str_ip.strip() for str_ip in config[serv]["ip_cam"].split(',')],
+                            config[serv]["login"],
+                            config[serv]["pass"]]
         # print(os.listdir(path="\\\\10.64.130.249\SkladTMC"))
         # Проверяем доступность каталога
-        try:
-            dir_cam = os.listdir(f"\\\\{dict_const[serv][0]}\{dict_const[serv][1][0]}")
-            print("\033[32m" + dict_const[serv][0] + " - Подключен \033[37m")
-        except:
-            print("\033[31m" + dict_const[serv][0] + " - Подключение отсутсвует \033[37m")
+
+        # try:
+        upath = f"\\\\{dict_const[serv][0]}"
+        name = dict_const[serv][4]
+        pwd = dict_const[serv][5]
+            # dir_cam = os.listdir()
+            # print("\033[32m" + dict_const[serv][0] + " - Подключен \033[37m")
+        # except:
+        #     print("\033[31m" + dict_const[serv][0] + " - Подключение отсутсвует \033[37m")
         date_cam = {}
         for ind in dict_const[serv][1]:
             # Получаем список каталогов с камерами
-            dir_cam = os.listdir(f"\\\\{dict_const[serv][0]}\{ind}")
+            # dir_cam = os.listdir(f"\\\\{dict_const[serv][0]}\{ind}")
+            if os.system('net use h: "' + upath + '\\'+ ind + '" /USER:' + name + " " + pwd) == 0:
+                print("\033[32m" + upath + '\\'+ ind + " - Подключен \033[37m")
+
+            dir_cam = os.listdir(f"H:/")
             for dir_cam_n in range(1, int(dict_const[serv][2]) + 1):
                 # Проверяем есть ли нужные камеры в списке
                 if f"CAM_{dir_cam_n}" in dir_cam:
                     # Получаем даты за которые есть запись
-                    date_cam_dir = os.listdir(f"\\\\{dict_const[serv][0]}\{ind}\CAM_{dir_cam_n}")
+                    # date_cam_dir = os.listdir(f"\\\\{dict_const[serv][0]}\{ind}\CAM_{dir_cam_n}")
+                    date_cam_dir = os.listdir(f"H:/CAM_{dir_cam_n}")
                     if f"CAM_{dir_cam_n}" in date_cam:
                         # Если данные по камере уже есть, то дабавляем
                         date_cam[f"CAM_{dir_cam_n}"].append(date_cam_dir[len(date_cam_dir) - 1][:10])
@@ -109,6 +121,7 @@ def securos(config):
                     # print(f"CAM_{dir_cam_n}","->",date_cam_dir[len(date_cam_dir)-1][:10],"->",now_date)
                 # else:
                 #     print(f"Каталог CAM_{dir_cam_n} - отсутсвует")
+            os.system("net use h: /delete /yes")
 
         for dir_cam_n in range(1, int(dict_const[serv][2]) + 1):
             # Проверяем, существует ли сегодняшняя дата в списке
